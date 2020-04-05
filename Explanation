@@ -1,0 +1,34 @@
+check if we can describe the statistical features of the missing deposit recieved time values from user profile of type business
+
+
+Task 1
+
+Missing Deposit Received Time values
+
+
+Records with the Profile Type category of business contain a high ratio of missing deposit received time values. Around 80% of 'Business' profile type records are missing deposit received time values. However, most of these have Payment Status as 'Cancelled'.
+
+
+Records with the User Language category of 'JA' are entirely missing deposit received time values. This is not the case with any other user language category.However number of records with missing values with missing deposit received time values for 'JA' language category are only 2 out of 71k. Hence, missing values cannot be attributed to the user language being 'JA'.
+
+
+Records with the source curreny code of 11 and 35 and records with target currency code of 65 and 73 are entirely missing deposit received time values. This is not the case with any source/target curreny code .
+
+Records with user country code of 7,43,47,54,75,93,117,119,121,179,198,217,225 are entirely missing deposit received time values.
+
+
+Almost all the records(>96%) with 'Cancelled' payment status are missing deposit received time values while none of the records with 'Transferred' payment status are missing deposit recived time values. Hence the mising of Dposit Received time values can be logically attributed to the  'Cancelled' payment status.  
+
+
+Task 2
+
+Missing Transfer Amount GBP values
+
+
+Records with the Age Year bucket value of '2. 18-25' is the only age-years bucket value that is missing Transfer Amount values. All other age buckets are not missing Transger Amount GBP Values. 
+
+
+Records with the User country code of '134' is the only country code value that is missing Transfer Amount values. All other country code values are not missing Transger Amount GBP Values. 
+
+Hence the missing of Transfer Amount values can be attributed to the age bucket of '2. 18-25' and User country code of '134'.
+

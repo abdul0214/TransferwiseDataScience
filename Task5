@@ -1,0 +1,43 @@
+• payment_cnt - for each payment_id count the number of previous payments submitted by the user
+• target_ccy_cnt - for each payment_id count the number of target currencies used by the user
+• source_ccy_cnt - for each payment_id count the number of source currencies used by the user
+• oldest_payment_age - for each payment_id calculate the age in days of the oldest payment made by the user
+• target_ccy_payments_cnt - for each payment_id count the number of payments previously made on the same target currency code by the user
+• source_ccy_payments_cnt - for each payment_id count the number of payments previously made on the same source currency code by the user
+• same_route_pmnts_cnt - for each payment_id count the number of payments previously made on the same route by the user
+• backward_route_pmnts_cnt - for each payment_id count the number of payments previously made on the backward route by the user
+
+
+select payment_id, 
+(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) payment_cnt,
+(select count(distinct target_currency_id) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) target_ccy_cnt,
+(select count(distinct source_currency_id) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) source_ccy_cnt,
+(select min(payment_submit_time) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) oldest_payment_age,
+(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) target_ccy_payments_cnt,
+(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.source_currency_id = p.source_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) source_ccy_payments_cnt,
+(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.user_id = p.user_id and p1.source_currency_id = p.source_currency_id and p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) same_route_pmnts_cnt,
+(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.user_id = p.user_id and p1.source_currency_id = p.source_currency_id and p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) backward_route_pmnts_cnt
+from PAYMENTS p
+
+
+select p.payment_id, 
+count(p1.payment_id) payment_cnt , 
+count(distinct p2.target_currency_id) target_ccy_cnt, 
+count(distinct p3.source_currency_id) source_ccy_cnt, 
+min(p4.payment_submit_time) oldest_payment_age,
+count(p5.payment_id) target_ccy_payments_cnt,
+count(p6.payment_id) source_ccy_payments_cnt, 
+count(p7.payment_id) same_route_pmnts_cnt,
+count(p8.payment_id) backward_route_pmnts_cnt
+from PAYMENTS p 
+inner join PAYMENTS p1 on p1.payment_id = p.payment_id,
+inner join PAYMENTS p2 on p2.payment_id = p.payment_id,
+inner join PAYMENTS p3 on p3.payment_id = p.payment_id,
+inner join PAYMENTS p4 on p4.payment_id = p.payment_id,
+inner join PAYMENTS p5 on p5.payment_id = p.payment_id and p4.target_currency_id = p.target_currency_id and p4.payment_submit_time < p.payment_submit_time,
+inner join PAYMENTS p6 on p6.payment_id = p.payment_id and p4.source_currency_id = p.source_currency_id and p4.payment_submit_time < p.payment_submit_time,
+inner join PAYMENTS p7 on p7.payment_id = p.payment_id and p7.user_id = p.user_id and p7.source_currency_id = p.source_currency_id and p7.target_currency_id = p.target_currency_id and p7.payment_submit_time < p.payment_submit_time,
+inner join PAYMENTS p8 on p8.payment_id = p.payment_id and p8.user_id = p.user_id and p8.source_currency_id = p.source_currency_id and p8.target_currency_id = p.target_currency_id and p8.payment_submit_time < p.payment_submit_time
+group by p.payment_id
+
+
