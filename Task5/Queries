@@ -10,22 +10,22 @@
 
 select payment_id, 
 
-(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) payment_cnt,
+(select count(payment_id) from PAYMENTS p1 where p1.user_profile_id = p.user_profile_id AND p1.payment_submit_time < p.payment_submit_time) payment_cnt,
 
-(select count(distinct target_currency_id) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) target_ccy_cnt,
+(select count(distinct target_currency_id) from PAYMENTS p1 where p.user_profile_id=p1.user_profile_id) target_ccy_cnt,
 
-(select count(distinct source_currency_id) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) source_ccy_cnt,
+(select count(distinct source_currency_id) from PAYMENTS p1 where p.user_profile_id=p1.user_profile_id) source_ccy_cnt,
 
-(select min(payment_submit_time) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) oldest_payment_age,
+(select DATEDIFF( SYSDATE(), min(payment_submit_time) ) from PAYMENTS p1 where p1.payment_id = p.payment_id group by p1.payment_id) oldest_payment_age,
 
-(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) target_ccy_cnt,
+IFNULL((select count(*) from PAYMENTS p1 where p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time ),0) target_ccy_payment_cnt,
 
-(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.source_currency_id = p.source_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) source_ccy_payments_cnt,
+IFNULL((select count(*) from PAYMENTS p1 where p1.source_currency_id = p.source_currency_id and p1.payment_submit_time < p.payment_submit_time ),0) source_ccy_payments_cnt,
 
-(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.user_id = p.user_id and p1.source_currency_id = p.source_currency_id and p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) same_route_pmnts_cnt,
+IFNULL((select count(payment_id) from PAYMENTS p1 where p1.source_currency_id = p.source_currency_id and p1.target_currency_id=p.target_currency_id and p1.user_profile_id = p.user_profile_id and p1.payment_submit_time < p.payment_submit_time ),0) same_route_pmnts_cnt,
 
-(select count(payment_id) from PAYMENTS p1 where p1.payment_id = p.payment_id and p1.user_id = p.user_id and p1.source_currency_id = p.source_currency_id and p1.target_currency_id = p.target_currency_id and p1.payment_submit_time < p.payment_submit_time group by p1.payment_id group by p1.payment_id) backward_route_pmnts_cnt
-from PAYMENTS p
+IFNULL((select count(payment_id) from PAYMENTS p1 where p1.user_profile_id = p.user_profile_id and p1.source_currency_id = p.target_currency_id and p1.target_currency_id = p.source_currency_id and p1.payment_submit_time < p.payment_submit_time  ),0) backward_route_pmnts_cnt
+from PAYMENTS p;
 
 
 
